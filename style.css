@@ -1,0 +1,238 @@
+/* Colorful Cyber-Neon Theme & Background WebGL Canvas */
+body {
+  background-color: #05050f;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #f8f9fa;
+  overflow-x: hidden;
+  margin: 0;
+}
+
+#webgl-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.z-index-1 {
+  z-index: 1;
+}
+
+/* Neon Glassmorphism Cards */
+.neon-glass-card {
+  background: rgba(15, 15, 35, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neon-glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 45px rgba(0, 242, 254, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-color: rgba(0, 242, 254, 0.3);
+}
+
+.bg-dark-glass {
+  background: rgba(10, 10, 25, 0.9) !important;
+}
+
+/* Vibrant Gradients & Accents */
+.gradient-text {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #f72585 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient-cyan {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+}
+
+.icon-box {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.bg-cyan { background-color: #00f2fe; }
+.bg-purple { background-color: #7209b7; }
+.bg-pink { background-color: #f72585; }
+.bg-yellow { background-color: #ffcc00; }
+
+/* Neon Input Styles */
+.neon-input {
+  background: rgba(25, 25, 50, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.neon-input:focus {
+  background: rgba(30, 30, 65, 0.9);
+  border-color: #00f2fe;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+}
+
+/* Custom Glowing Buttons */
+.btn-glow-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  transition: all 0.3s ease;
+}
+.btn-glow-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+  color: #fff;
+}
+
+.btn-glow-warning {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+  transition: all 0.3s ease;
+}
+.btn-glow-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+  color: #fff;
+}
+
+.btn-glow-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  transition: all 0.3s ease;
+}
+.btn-glow-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+  color: #fff;
+}
+
+/* Neon Outline Radio Buttons */
+.btn-outline-neon {
+  color: #00f2fe;
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn-check:checked + .btn-outline-neon {
+  background: #00f2fe;
+  color: #05050f;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+}
+.btn-outline-neon:hover {
+  background: rgba(0, 242, 254, 0.15);
+  color: #00f2fe;
+  border-color: #00f2fe;
+}
+
+/* Floating & Entrance Animations */
+.animate-float {
+  animation: floatEffect 6s ease-in-out infinite;
+}
+
+@keyframes floatEffect {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: revealUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes revealUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cascading Row Slide-in */
+.row-cascade {
+  animation: slideInCascade 0.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+@keyframes slideInCascade {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Glowing Badges & Table Highlights */
+.badge-hit {
+  background-color: #10b981;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+}
+
+.badge-miss {
+  background-color: #ef4444;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+.badge-dead-miss {
+  background-color: #f59e0b;
+  color: #05050f;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+}
+
+.row-hit { background-color: rgba(16, 185, 129, 0.12) !important; }
+.row-miss { background-color: rgba(239, 68, 68, 0.12) !important; }
+.row-dead { background-color: rgba(245, 158, 11, 0.2) !important; }
+
+.pulse-badge {
+  animation: badgePulse 2s infinite;
+}
+
+@keyframes badgePulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 242, 254, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}

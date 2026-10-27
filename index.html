@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paging TLB Hit/Miss Analyzer | 3D WebGL Edition</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Three.js for Interactive 3D WebGL Background -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Custom Colorful & Motion CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Interactive 3D WebGL Background Canvas -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <div class="container py-5 position-relative z-index-1">
+    <!-- Header / Scrollytelling Intro -->
+    <header class="text-center py-5 mb-5 neon-glass-card animate-float">
+      <span class="badge bg-gradient-cyan text-dark mb-3 px-3 py-2 rounded-pill fw-bold text-uppercase tracking-wider">Advanced OS Simulation</span>
+      <h1 class="display-5 fw-extrabold text-white gradient-text">Paging TLB Hit/Miss Analyzer</h1>
+      <p class="text-light lead mb-0 opacity-85">Traditional TLB vs Simplified DEPOT-Inspired Memory Architecture</p>
+    </header>
+
+    <!-- Inputs Section -->
+    <section class="neon-glass-card p-4 p-md-5 mb-5 scroll-reveal">
+      <div class="d-flex align-items-center mb-4">
+        <div class="icon-box bg-cyan text-dark fw-bold rounded-circle me-3">1</div>
+        <h3 class="fw-bold text-white mb-0">Configuration & Parameters</h3>
+      </div>
+      
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label text-light font-monospace">TLB Size</label>
+          <input type="number" id="tlbSize" class="form-control neon-input" value="3" min="1">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label text-light font-monospace">Page Size (KB)</label>
+          <input type="number" id="pageSize" class="form-control neon-input" value="4" min="1">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label text-light font-monospace">TLB Lookup Time (ns)</label>
+          <input type="number" id="tTlb" class="form-control neon-input" value="10" min="0">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label text-light font-monospace">Memory Access Time (ns)</label>
+          <input type="number" id="tMem" class="form-control neon-input" value="100" min="1">
+        </div>
+        <div class="col-md-12">
+          <label class="form-label text-light font-monospace">Page Reference Sequence</label>
+          <input type="text" id="seqInput" class="form-control neon-input" value="1 2 3 4 1 2 4 1">
+        </div>
+      </div>
+
+      <!-- Algorithm Selection & Controls -->
+      <div class="row mt-4 align-items-center">
+        <div class="col-lg-6 mb-3 mb-lg-0">
+          <div class="btn-group w-100 neon-group" role="group">
+            <input type="radio" class="btn-check" name="algoMode" id="modeTrad" value="trad">
+            <label class="btn btn-outline-neon" for="modeTrad">Traditional TLB</label>
+
+            <input type="radio" class="btn-check" name="algoMode" id="modeDepot" value="depot">
+            <label class="btn btn-outline-neon" for="modeDepot">DEPOT-Inspired</label>
+
+            <input type="radio" class="btn-check" name="algoMode" id="modeCompare" value="compare" checked>
+            <label class="btn btn-outline-neon" for="modeCompare">Compare Both</label>
+          </div>
+        </div>
+        <div class="col-lg-6 text-lg-end">
+          <button id="btnRun" class="btn btn-glow-success me-2 px-4 py-2 mb-2 mb-sm-0">Run Simulation</button>
+          <button id="btnNext" class="btn btn-glow-warning me-2 px-3 py-2 mb-2 mb-sm-0">Next Step</button>
+          <button id="btnReset" class="btn btn-glow-danger px-3 py-2">Reset</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error Alert -->
+    <div id="errorAlert" class="alert alert-danger d-none animate-shake mb-4" role="alert"></div>
+
+    <!-- Simulation Table Section -->
+    <section class="neon-glass-card p-4 p-md-5 mb-5 scroll-reveal">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center">
+          <div class="icon-box bg-purple text-white fw-bold rounded-circle me-3">2</div>
+          <h3 class="fw-bold text-white mb-0">Step-by-Step Simulation Trace</h3>
+        </div>
+        <span id="stepCounter" class="badge bg-cyan text-dark fs-6 px-3 py-2 pulse-badge">Step 0</span>
+      </div>
+      <div class="table-responsive neon-table-container" style="max-height: 400px;">
+        <table class="table table-dark table-hover text-center align-middle mb-0" id="traceTable">
+          <thead class="sticky-top bg-dark-glass">
+            <tr>
+              <th>Step</th>
+              <th>Page Ref</th>
+              <th>Result</th>
+              <th>TLB Contents</th>
+              <th>Page Table Access</th>
+              <th>Evicted Page</th>
+              <th>Protected Page</th>
+              <th>Recently Evicted</th>
+              <th class="text-start">Remarks</th>
+            </tr>
+          </thead>
+          <tbody id="traceTableBody">
+            <tr>
+              <td colspan="9" class="text-muted py-4">Click "Run Simulation" or "Next Step" to start interactive walkthrough.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Results & Charts Section -->
+    <div class="row g-4 mb-5">
+      <div class="col-lg-6 scroll-reveal">
+        <div class="neon-glass-card p-4 p-md-4 h-100">
+          <div class="d-flex align-items-center mb-4">
+            <div class="icon-box bg-pink text-white fw-bold rounded-circle me-3">3</div>
+            <h4 class="fw-bold text-white mb-0">Performance Parameters</h4>
+          </div>
+          <div id="metricsContainer" class="text-light">
+            <p class="text-muted text-center py-5">Run simulation to view performance comparison.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 scroll-reveal">
+        <div class="neon-glass-card p-4 p-md-4 h-100">
+          <div class="d-flex align-items-center mb-4">
+            <div class="icon-box bg-yellow text-dark fw-bold rounded-circle me-3">4</div>
+            <h4 class="fw-bold text-white mb-0">Dynamic Visual Comparison</h4>
+          </div>
+          <div style="height: 280px;" class="position-relative">
+            <canvas id="comparisonChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OS Concepts Scrollytelling Panel -->
+    <section class="neon-glass-card p-4 p-md-5 scroll-reveal mb-5">
+      <h5 class="fw-bold text-cyan mb-3">✨ Core OS & Architectural Concepts</h5>
+      <div class="row g-3 text-light small">
+        <div class="col-md-3">
+          <div class="p-3 bg-dark-glass rounded border border-cyan-subtle">
+            <strong class="text-cyan">TLB Hit:</strong> Frame mapping found instantly in cache. Avoids physical memory page table walks[cite: 2].
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-dark-glass rounded border border-danger-subtle">
+            <strong class="text-danger">TLB Miss:</strong> Mapping absent. Forces expensive main memory page table access and lookup latency[cite: 3].
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-dark-glass rounded border border-warning-subtle">
+            <strong class="text-warning">Dead-Entry Miss:</strong> Evicted page re-requested shortly after, triggering redundant misses[cite: 14].
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="p-3 bg-dark-glass rounded border border-success-subtle">
+            <strong class="text-success">DEPOT Protection:</strong> Guards re-requested dead entries from immediate re-eviction cycles[cite: 14].
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
